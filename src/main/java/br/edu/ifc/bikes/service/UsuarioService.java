@@ -5,6 +5,7 @@ import br.edu.ifc.bikes.dto.UsuarioResponseDTO;
 import br.edu.ifc.bikes.dto.mapper.UsuarioMapper;
 import br.edu.ifc.bikes.entity.Usuario;
 import br.edu.ifc.bikes.exception.EntityNotFoundException;
+import br.edu.ifc.bikes.exception.PasswordInvalidException;
 import br.edu.ifc.bikes.exception.UsernameUniqueViolationException;
 import br.edu.ifc.bikes.repository.UsuarioRepository;
 import jakarta.transaction.Transactional;
@@ -37,13 +38,22 @@ public class UsuarioService {
         ));
     }
 
-    public UsuarioResponseDTO updatePassword(Long id, String password) {
-        Usuario usuario = usuarioRepository.findById(id).orElse(null);
-        if (usuario != null){
-            usuario.setPassword(password);
-            return usuarioMapper.toResponse(usuarioRepository.save(usuario));
+    @Transactional
+    public void updatePassword(Long id, String senhaAtual, String novaSenha, String confirmaSenha) {
+        if (!novaSenha.equals(confirmaSenha)) {
+            throw new PasswordInvalidException("Nova senha não confere com a confirmação de senha");
         }
-        return null;
+
+        Usuario usuario = usuarioRepository.findById(id).orElseThrow(
+                ()->new EntityNotFoundException(String.format("Usuário com id=%d não encontrado", id))
+        );
+
+        if (!usuario.getPassword().equals(senhaAtual)) {
+            throw new PasswordInvalidException("Sua senha atual não confere");
+        }
+
+        usuario.setPassword(novaSenha);
+        usuarioRepository.save(usuario);
     }
 
     public List<UsuarioResponseDTO> getAll(){
