@@ -88,4 +88,7 @@ Dependência (`pom.xml`):
 
 ## Atividade 02 - Teste de Alterar Senha
 
-  - Desenvolver métodos de teste para as 03 possibilidades: sucesso, senha atual inválida e senha e confirmação não conferem.
+  - Desenvolver métodos de teste para as 04 possibilidades: sucesso, senha atual inválida, senha e confirmação não conferem e campos inválidos (vazios, senhas com menos e mais que 6 caracteres).
+      - Observar (no Controller) que alteração de senha não retorna um corpo de mensagem, ou seja, o teste não terá retorno.
+          - Como não tem retorno, os testes de valores não são necessários.
+      - O método para o status será o `isNoContent()`.
