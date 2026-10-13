@@ -133,7 +133,6 @@ public class UsuarioIT extends RuntimeException {
                 .expectBody(ErrorMessage.class)
                 .returnResult().getResponseBody();
 
-
         org.assertj.core.api.Assertions.assertThat(responseBody).isNotNull();
         org.assertj.core.api.Assertions.assertThat(responseBody.getStatus()).isEqualTo(404);
     }
