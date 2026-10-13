@@ -63,7 +63,50 @@ public class UsuarioIT extends RuntimeException {
         org.assertj.core.api.Assertions.assertThat(responseBody.getStatus()).isEqualTo(409);
     }
 
-    @Test
+    @Test //TESTA PARA O CASO DE USUÁRIO INVÁLIDO
+    //FORAM REALIZADOS 03 TESTES - O3 DIFERENTES ERROS NO FORMATO DO EMAIL
+    public void criarUsuario_UsernameInvalido_RetornaErrorMessageStatus422(){
+        ErrorMessage responseBody = testClient
+                .post()
+                .uri("/api/v1/usuarios")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(new UsuarioRequestDTO("", "123456"))
+                .exchange()
+                .expectStatus().isEqualTo(422)
+                .expectBody(ErrorMessage.class)
+                .returnResult().getResponseBody();
+
+        org.assertj.core.api.Assertions.assertThat(responseBody).isNotNull();
+        org.assertj.core.api.Assertions.assertThat(responseBody.getStatus()).isEqualTo(422);
+
+        responseBody = testClient
+                .post()
+                .uri("/api/v1/usuarios")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(new UsuarioRequestDTO("jose@", "123456"))
+                .exchange()
+                .expectStatus().isEqualTo(422)
+                .expectBody(ErrorMessage.class)
+                .returnResult().getResponseBody();
+
+        org.assertj.core.api.Assertions.assertThat(responseBody).isNotNull();
+        org.assertj.core.api.Assertions.assertThat(responseBody.getStatus()).isEqualTo(422);
+
+        responseBody = testClient
+                .post()
+                .uri("/api/v1/usuarios")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(new UsuarioRequestDTO("jose@gmail.", "123456"))
+                .exchange()
+                .expectStatus().isEqualTo(422)
+                .expectBody(ErrorMessage.class)
+                .returnResult().getResponseBody();
+
+        org.assertj.core.api.Assertions.assertThat(responseBody).isNotNull();
+        org.assertj.core.api.Assertions.assertThat(responseBody.getStatus()).isEqualTo(422);
+    }
+
+    @Test //TESTA PARA O CASO DE SUCESSO - USUÁRIO EXISTENTE
     public void buscarUsuario_IdExistente_RetornaUsuario(){
         UsuarioResponseDTO responseBody = testClient
                 .get()
@@ -78,5 +121,20 @@ public class UsuarioIT extends RuntimeException {
         org.assertj.core.api.Assertions.assertThat(responseBody.id()).isEqualTo(100);
         org.assertj.core.api.Assertions.assertThat(responseBody.username()).isEqualTo("jose@gmail.com");
         org.assertj.core.api.Assertions.assertThat(responseBody.role()).isEqualTo("ADMIN");
+    }
+
+    @Test //TESTA PARA O CASO DE ERRO - USUÁRIO INEXISTENTE (ID 110)
+    public void buscarUsuario_IdInexistente_RetornaUsuario(){
+        ErrorMessage responseBody = testClient
+                .get()
+                .uri("/api/v1/usuarios/110")
+                .exchange()
+                .expectStatus().isNotFound()
+                .expectBody(ErrorMessage.class)
+                .returnResult().getResponseBody();
+
+
+        org.assertj.core.api.Assertions.assertThat(responseBody).isNotNull();
+        org.assertj.core.api.Assertions.assertThat(responseBody.getStatus()).isEqualTo(404);
     }
 }
