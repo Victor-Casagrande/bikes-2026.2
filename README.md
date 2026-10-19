@@ -78,9 +78,17 @@ Dependência (`pom.xml`):
             })
    ```
   
-## Atividade - Alterar Senha
+## Atividade 01 - Alterar Senha
 
   - Modificar a **alteração de senha** para que, além do campo `nova senha`, seja informado também a `confirmação de senha` e a `senha atual`.
   - Será necessário criar a classe `UsuarioSenhaDTO.java` para requisição.
     - Não esquecer de validar os campos.
   - Fazer o tratamento de exceção criando a classe `PasswordInvalidException` para validar a senha atual e comparar a nova senha com a confirmação.
+
+
+## Atividade 02 - Teste de Alterar Senha
+
+  - Desenvolver métodos de teste para as 04 possibilidades: sucesso, senha atual inválida, senha e confirmação não conferem e campos inválidos (vazios, senhas com menos e mais que 6 caracteres).
+      - Observar (no Controller) que alteração de senha não retorna um corpo de mensagem, ou seja, o teste não terá retorno.
+          - Como não tem retorno, os testes de valores não são necessários.
+      - O método para o status será o `isNoContent()`.
