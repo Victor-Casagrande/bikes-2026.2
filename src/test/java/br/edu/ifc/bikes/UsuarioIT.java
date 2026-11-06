@@ -2,7 +2,7 @@ package br.edu.ifc.bikes;
 
 import br.edu.ifc.bikes.dto.UsuarioRequestDTO;
 import br.edu.ifc.bikes.dto.UsuarioResponseDTO;
-import br.edu.ifc.bikes.dto.UsuarioSenhaDTO;
+import br.edu.ifc.bikes.dto.UsuarioSenhaDto;
 import br.edu.ifc.bikes.web.exception.ErrorMessage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -64,8 +64,7 @@ public class UsuarioIT extends RuntimeException {
         org.assertj.core.api.Assertions.assertThat(responseBody.getStatus()).isEqualTo(409);
     }
 
-    @Test //TESTA PARA O CASO DE USUÁRIO INVÁLIDO
-    //FORAM REALIZADOS 03 TESTES - O3 DIFERENTES ERROS NO FORMATO DO EMAIL
+    @Test
     public void criarUsuario_UsernameInvalido_RetornaErrorMessageStatus422(){
         ErrorMessage responseBody = testClient
                 .post()
@@ -107,11 +106,12 @@ public class UsuarioIT extends RuntimeException {
         org.assertj.core.api.Assertions.assertThat(responseBody.getStatus()).isEqualTo(422);
     }
 
-    @Test //TESTA PARA O CASO DE SUCESSO - USUÁRIO EXISTENTE
+    @Test
     public void buscarUsuario_IdExistente_RetornaUsuario(){
         UsuarioResponseDTO responseBody = testClient
                 .get()
                 .uri("/api/v1/usuarios/100")
+                .headers(JwtAuthentication.oAuth(testClient, "jose@gmail.com", "123456"))
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(UsuarioResponseDTO.class)
@@ -124,11 +124,12 @@ public class UsuarioIT extends RuntimeException {
         org.assertj.core.api.Assertions.assertThat(responseBody.role()).isEqualTo("ADMIN");
     }
 
-    @Test //TESTA PARA O CASO DE ERRO - USUÁRIO INEXISTENTE (ID 110)
+    @Test
     public void buscarUsuario_IdInexistente_RetornaUsuario(){
         ErrorMessage responseBody = testClient
                 .get()
                 .uri("/api/v1/usuarios/110")
+                .headers(JwtAuthentication.oAuth(testClient, "jose@gmail.com", "123456"))
                 .exchange()
                 .expectStatus().isNotFound()
                 .expectBody(ErrorMessage.class)
@@ -138,24 +139,26 @@ public class UsuarioIT extends RuntimeException {
         org.assertj.core.api.Assertions.assertThat(responseBody.getStatus()).isEqualTo(404);
     }
 
-    @Test //TESTA PARA O CASO DE SUCESSO - ALTERAÇÃO DE SENHA NÃO RETORNA CORPO
+    @Test
     public void editarSenha_ComDadosValidos_RetornaStatus204(){
         testClient
                 .patch()
                 .uri("/api/v1/usuarios/100")
+                .headers(JwtAuthentication.oAuth(testClient, "jose@gmail.com", "123456"))
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(new UsuarioSenhaDTO("123456", "654321", "654321"))
+                .bodyValue(new UsuarioSenhaDto("654321", "654321", "123456"))
                 .exchange()
                 .expectStatus().isNoContent();
     }
 
-    @Test //TESTA PARA O CASO DE ERRO - SENHA ATUAL NÃO CONFERE COM A CADASTRADA
+    @Test
     public void editarSenha_SenhaAtualInvalida_RetornaErrorMessageStatus400(){
         ErrorMessage responseBody = testClient
                 .patch()
                 .uri("/api/v1/usuarios/100")
+                .headers(JwtAuthentication.oAuth(testClient, "jose@gmail.com", "123456"))
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(new UsuarioSenhaDTO("000000", "654321", "654321"))
+                .bodyValue(new UsuarioSenhaDto("654321", "654321", "000000"))
                 .exchange()
                 .expectStatus().isEqualTo(400)
                 .expectBody(ErrorMessage.class)
@@ -165,13 +168,14 @@ public class UsuarioIT extends RuntimeException {
         org.assertj.core.api.Assertions.assertThat(responseBody.getStatus()).isEqualTo(400);
     }
 
-    @Test //TESTA PARA O CASO DE ERRO - NOVA SENHA E CONFIRMAÇÃO NÃO CONFEREM
+    @Test
     public void editarSenha_SenhaEConfirmacaoNaoConferem_RetornaErrorMessageStatus400(){
         ErrorMessage responseBody = testClient
                 .patch()
                 .uri("/api/v1/usuarios/100")
+                .headers(JwtAuthentication.oAuth(testClient, "jose@gmail.com", "123456"))
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(new UsuarioSenhaDTO("123456", "654321", "999999"))
+                .bodyValue(new UsuarioSenhaDto("654321", "999999", "123456"))
                 .exchange()
                 .expectStatus().isEqualTo(400)
                 .expectBody(ErrorMessage.class)
@@ -181,14 +185,14 @@ public class UsuarioIT extends RuntimeException {
         org.assertj.core.api.Assertions.assertThat(responseBody.getStatus()).isEqualTo(400);
     }
 
-    @Test //TESTA PARA O CASO DE CAMPOS INVÁLIDOS
-    //FORAM REALIZADOS 03 TESTES - CAMPOS VAZIOS, SENHAS COM MENOS E COM MAIS DE 6 CARACTERES
+    @Test
     public void editarSenha_CamposInvalidos_RetornaErrorMessageStatus422(){
         ErrorMessage responseBody = testClient
                 .patch()
                 .uri("/api/v1/usuarios/100")
+                .headers(JwtAuthentication.oAuth(testClient, "jose@gmail.com", "123456"))
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(new UsuarioSenhaDTO("", "", ""))
+                .bodyValue(new UsuarioSenhaDto("", "", ""))
                 .exchange()
                 .expectStatus().isEqualTo(422)
                 .expectBody(ErrorMessage.class)
@@ -200,8 +204,9 @@ public class UsuarioIT extends RuntimeException {
         responseBody = testClient
                 .patch()
                 .uri("/api/v1/usuarios/100")
+                .headers(JwtAuthentication.oAuth(testClient, "jose@gmail.com", "123456"))
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(new UsuarioSenhaDTO("12345", "12345", "12345"))
+                .bodyValue(new UsuarioSenhaDto("12345", "12345", "12345"))
                 .exchange()
                 .expectStatus().isEqualTo(422)
                 .expectBody(ErrorMessage.class)
@@ -213,8 +218,9 @@ public class UsuarioIT extends RuntimeException {
         responseBody = testClient
                 .patch()
                 .uri("/api/v1/usuarios/100")
+                .headers(JwtAuthentication.oAuth(testClient, "jose@gmail.com", "123456"))
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(new UsuarioSenhaDTO("1234567", "1234567", "1234567"))
+                .bodyValue(new UsuarioSenhaDto("1234567", "1234567", "1234567"))
                 .exchange()
                 .expectStatus().isEqualTo(422)
                 .expectBody(ErrorMessage.class)
