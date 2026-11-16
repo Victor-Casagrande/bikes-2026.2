@@ -121,7 +121,6 @@ o cliente deve ter um `usuário` cadastrado e autenticado.
 - Campos de auditoria (os mesmos de `Usuário`)
 
 ## Atividade 04 - Recurso Bicicleta
-O enunciado foi passado só como "recurso Bicicleta, ainda mais simples que Cliente". Foi implementado com as definições abaixo.
 
 **Recurso `Bicicleta`**:
 - id (Long)
