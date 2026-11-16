@@ -46,8 +46,9 @@ public class Bicicleta implements java.io.Serializable {
     @LastModifiedBy
     private String modificadoPor;
 
+    //ALUGADA é definido só pela locação; MANUTENCAO tira a bicicleta de circulação
     public enum StatusBicicleta {
-        LIVRE, ALUGADA
+        LIVRE, ALUGADA, MANUTENCAO
     }
 
     @Override

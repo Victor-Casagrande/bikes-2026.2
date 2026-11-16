@@ -12,6 +12,7 @@ public record BicicletaCreateDto(
         @Size(min = 2, max = 100, message = "O modelo deve ter entre 2 e 100 caracteres")
         String modelo,
         @NotBlank(message = "O status é obrigatório")
-        @Pattern(regexp = "LIVRE|ALUGADA", message = "O status deve ser LIVRE ou ALUGADA")
+        //ALUGADA não é aceito: esse status só é definido ao registrar uma locação
+        @Pattern(regexp = "LIVRE|MANUTENCAO", message = "O status deve ser LIVRE ou MANUTENCAO")
         String status
 ) { }
