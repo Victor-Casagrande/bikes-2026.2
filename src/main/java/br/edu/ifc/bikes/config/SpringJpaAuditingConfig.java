@@ -17,6 +17,7 @@ public class SpringJpaAuditingConfig implements AuditorAware<String> {
         if (authentication != null && authentication.isAuthenticated()){
             return Optional.of(authentication.getName());
         }
-        return null;
+        //AuditorAware nunca deve devolver null: Optional vazio indica "sem usuário"
+        return Optional.empty();
     }
 }
