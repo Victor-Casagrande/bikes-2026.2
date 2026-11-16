@@ -1,5 +1,6 @@
 package br.edu.ifc.bikes.web.exception;
 
+import br.edu.ifc.bikes.exception.CodigoUniqueViolationException;
 import br.edu.ifc.bikes.exception.CpfUniqueViolationException;
 import br.edu.ifc.bikes.exception.EntityNotFoundException;
 import br.edu.ifc.bikes.exception.PasswordInvalidException;
@@ -28,7 +29,7 @@ public class ApiExceptionHandler {
                 .body(new ErrorMessage(request, HttpStatus.UNPROCESSABLE_CONTENT, "Campo(s) inválido(s)", result));
     }
 
-    @ExceptionHandler({UsernameUniqueViolationException.class, CpfUniqueViolationException.class})
+    @ExceptionHandler({UsernameUniqueViolationException.class, CpfUniqueViolationException.class, CodigoUniqueViolationException.class})
     public ResponseEntity<ErrorMessage> usernameUniqueViolationException(
             RuntimeException ex,
             HttpServletRequest request){

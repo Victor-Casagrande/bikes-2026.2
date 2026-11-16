@@ -119,3 +119,21 @@ o cliente deve ter um `usuário` cadastrado e autenticado.
 - O recurso `Cliente` deve ser documentado com SpringDoc OpenAPI 3.1 e Swagger 3.
 - Fazer validação dos campos de entrada.
 - Campos de auditoria (os mesmos de `Usuário`)
+
+## Atividade 04 - Recurso Bicicleta
+O enunciado foi passado só como "recurso Bicicleta, ainda mais simples que Cliente". Foi implementado com as definições abaixo.
+
+**Recurso `Bicicleta`**:
+- id (Long)
+- codigo (String) - deve ser único, de 4 a 10 caracteres
+- modelo (String)
+- status (`LIVRE` ou `ALUGADA`)
+- métodos `equals` e `hashCode`
+- Campos de auditoria (os mesmos de `Usuário`)
+
+**Funcionalidades** (todas exigem autenticação):
+- `POST /api/v1/bicicletas`: cadastro, apenas para o Admin. Código repetido retorna `409`.
+- `GET /api/v1/bicicletas`: lista todas as bicicletas, para Admin e Cliente.
+- `GET /api/v1/bicicletas/{codigo}`: consulta pelo código, para Admin e Cliente.
+
+**Classes criadas:** `Bicicleta`, `BicicletaCreateDto`, `BicicletaResponseDto`, `BicicletaMapper`, `BicicletaRepository`, `BicicletaService`, `BicicletaController`, `CodigoUniqueViolationException` e os testes em `BicicletaIT`.
