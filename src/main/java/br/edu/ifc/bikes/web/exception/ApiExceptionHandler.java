@@ -4,6 +4,7 @@ import br.edu.ifc.bikes.exception.BicicletaIndisponivelException;
 import br.edu.ifc.bikes.exception.CodigoUniqueViolationException;
 import br.edu.ifc.bikes.exception.CpfUniqueViolationException;
 import br.edu.ifc.bikes.exception.EntityNotFoundException;
+import br.edu.ifc.bikes.exception.LocacaoFinalizadaException;
 import br.edu.ifc.bikes.exception.PasswordInvalidException;
 import br.edu.ifc.bikes.exception.UsernameUniqueViolationException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,7 +32,7 @@ public class ApiExceptionHandler {
     }
 
     @ExceptionHandler({UsernameUniqueViolationException.class, CpfUniqueViolationException.class, CodigoUniqueViolationException.class,
-            BicicletaIndisponivelException.class})
+            BicicletaIndisponivelException.class, LocacaoFinalizadaException.class})
     public ResponseEntity<ErrorMessage> usernameUniqueViolationException(
             RuntimeException ex,
             HttpServletRequest request){
