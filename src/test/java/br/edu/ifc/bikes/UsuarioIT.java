@@ -229,4 +229,41 @@ public class UsuarioIT extends RuntimeException {
         org.assertj.core.api.Assertions.assertThat(responseBody).isNotNull();
         org.assertj.core.api.Assertions.assertThat(responseBody.getStatus()).isEqualTo(422);
     }
+
+    @Test //O ADMINISTRADOR AUTENTICADO LISTA TODOS OS USUÁRIOS
+    public void listarUsuarios_PeloAdmin_RetornaListaStatus200(){
+        java.util.List<UsuarioResponseDTO> responseBody = testClient
+                .get()
+                .uri("/api/v1/usuarios")
+                .headers(JwtAuthentication.oAuth(testClient, "jose@gmail.com", "123456"))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(UsuarioResponseDTO.class)
+                .returnResult().getResponseBody();
+
+        org.assertj.core.api.Assertions.assertThat(responseBody).isNotNull();
+        org.assertj.core.api.Assertions.assertThat(responseBody).hasSize(3);
+        org.assertj.core.api.Assertions.assertThat(responseBody)
+                .extracting(UsuarioResponseDTO::username)
+                .containsExactlyInAnyOrder("jose@gmail.com", "maria@gmail.com", "joao@gmail.com");
+    }
+
+    @Test
+    public void listarUsuarios_UsuarioCliente_RetornaStatus403(){
+        testClient
+                .get()
+                .uri("/api/v1/usuarios")
+                .headers(JwtAuthentication.oAuth(testClient, "maria@gmail.com", "123456"))
+                .exchange()
+                .expectStatus().isForbidden();
+    }
+
+    @Test
+    public void listarUsuarios_SemAutenticacao_RetornaStatus403(){
+        testClient
+                .get()
+                .uri("/api/v1/usuarios")
+                .exchange()
+                .expectStatus().isForbidden();
+    }
 }
