@@ -124,6 +124,18 @@
 			<version>0.13.0</version>
 			<scope>runtime</scope>
 		</dependency>
+		<!-- Relatórios com JasperReports (usado pelo JasperService) -->
+		<dependency>
+			<groupId>net.sf.jasperreports</groupId>
+			<artifactId>jasperreports</artifactId>
+			<version>7.0.8</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.jasperreports</groupId>
+			<artifactId>jasperreports-pdf</artifactId>
+			<version>7.0.8</version>
+		</dependency>
 	</dependencies>
 
 	<build>
