@@ -6,6 +6,7 @@ import br.edu.ifc.bikes.exception.CpfUniqueViolationException;
 import br.edu.ifc.bikes.exception.EntityNotFoundException;
 import br.edu.ifc.bikes.exception.LocacaoFinalizadaException;
 import br.edu.ifc.bikes.exception.PasswordInvalidException;
+import br.edu.ifc.bikes.exception.RelatorioException;
 import br.edu.ifc.bikes.exception.UsernameUniqueViolationException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
@@ -63,6 +64,17 @@ public class ApiExceptionHandler {
                 .status(HttpStatus.BAD_REQUEST)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(new ErrorMessage(request, HttpStatus.BAD_REQUEST, ex.getMessage()));
+    }
+
+    @ExceptionHandler(RelatorioException.class)
+    public ResponseEntity<ErrorMessage> relatorioException(
+            RuntimeException ex,
+            HttpServletRequest request){
+
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(new ErrorMessage(request, HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage()));
     }
 
 }

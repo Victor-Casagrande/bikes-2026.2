@@ -6,6 +6,7 @@ import br.edu.ifc.bikes.dto.mapper.ClienteMapper;
 import br.edu.ifc.bikes.entity.Cliente;
 import br.edu.ifc.bikes.jwt.JwtUserDetails;
 import br.edu.ifc.bikes.service.ClienteService;
+import br.edu.ifc.bikes.service.JasperService;
 import br.edu.ifc.bikes.service.UsuarioService;
 import br.edu.ifc.bikes.web.exception.ErrorMessage;
 import io.swagger.v3.oas.annotations.Operation;
@@ -17,7 +18,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -25,7 +28,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Tag(name = "Clientes", description = "Contém todas as operações relativas aos recursos para cadastro e leitura de um cliente. Todas exigem um Bearer Token, obtido em /api/v1/auth.")
+@Tag(name = "Clientes", description = "Contém todas as operações relativas aos recursos para cadastro, leitura e relatório de clientes. Todas exigem um Bearer Token, obtido em /api/v1/auth.")
 @RestController
 @RequestMapping("api/v1/clientes")
 @RequiredArgsConstructor
@@ -34,6 +37,30 @@ public class ClienteController {
     private final ClienteService clienteService;
     private final UsuarioService usuarioService;
     private final ClienteMapper clienteMapper;
+    private final JasperService jasperService;
+
+    //mesmo resultado do endpoint do README (PDF exibido no navegador), mas devolvendo os bytes
+    //no ResponseEntity em vez de escrever direto no HttpServletResponse
+    @Operation(summary = "Gerar o relatório de clientes em PDF",
+        description = "Relatório (JasperReports) com id, nome, CPF, e-mail e data de cadastro de todos os clientes. " +
+                "Acesso restrito a Role='ADMIN'.",
+        responses = {
+                @ApiResponse(responseCode = "200", description = "Relatório gerado com sucesso",
+                        content = @Content(mediaType = "application/pdf", schema = @Schema(type = "string", format = "binary"))),
+                @ApiResponse(responseCode = "403", description = "Usuário sem permissão (sem token ou perfil CLIENTE)",
+                        content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class))),
+                @ApiResponse(responseCode = "500", description = "Erro ao gerar o relatório",
+                        content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class)))
+        })
+    @GetMapping("/relatorio")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<byte[]> gerarRelatorio() {
+        byte[] relatorio = jasperService.generatePdf();
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_PDF)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=" + System.currentTimeMillis() + ".pdf")
+                .body(relatorio);
+    }
 
     @Operation(summary = "Criar um novo cliente",
         description = "Recurso para criar um cliente vinculado ao usuário autenticado. Acesso restrito a Role='CLIENTE'.",

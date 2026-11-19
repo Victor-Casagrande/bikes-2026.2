@@ -1,0 +1,96 @@
+<jasperReport name="clientes-bikes" pageWidth="595" pageHeight="842" whenNoDataType="AllSectionsNoDetail" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="0a218f41-8abd-49ee-8812-6f5002c31c2f">
+	<parameter name="IMG_DIR" forPrompting="false" class="java.lang.String"/>
+	<query language="SQL"><![CDATA[SELECT c.id, c.nome, c.cpf, u.username AS email, c.data_criacao FROM clientes c INNER JOIN usuarios u ON u.id = c.id_usuario ORDER BY c.nome]]></query>
+	<field name="id" class="java.lang.Long"/>
+	<field name="nome" class="java.lang.String"/>
+	<field name="cpf" class="java.lang.String"/>
+	<field name="email" class="java.lang.String"/>
+	<field name="data_criacao" class="java.sql.Timestamp"/>
+	<title height="104">
+		<element kind="image" uuid="96791eee-5250-4c16-b938-8ab9cef3f58e" x="0" y="0" width="555" height="60" scaleImage="RetainShape">
+			<expression><![CDATA[$P{IMG_DIR} + "images/bikes2.png"]]></expression>
+		</element>
+		<element kind="staticText" uuid="059bd353-8184-4250-9059-09245a74a228" x="0" y="66" width="555" height="20" fontSize="14.0" bold="true" hTextAlign="Center" vTextAlign="Middle">
+			<text><![CDATA[Relatório de Clientes]]></text>
+		</element>
+		<element kind="textField" uuid="200a1fb3-3288-42f8-bb49-37941dddcfd1" x="0" y="86" width="555" height="14" fontSize="8.0" blankWhenNull="true" hTextAlign="Center" vTextAlign="Middle">
+			<expression><![CDATA["Emitido em " + java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))]]></expression>
+		</element>
+	</title>
+	<columnHeader height="20">
+		<element kind="staticText" uuid="e5012f00-c9be-4b1c-931d-76e75b4a6b7c" x="0" y="0" width="40" height="20" backcolor="#EEEEEE" mode="Opaque" fontSize="10.0" bold="true" hTextAlign="Left" vTextAlign="Middle">
+			<box leftPadding="4">
+				<bottomPen lineWidth="1.0" lineColor="#2E7D32"/>
+			</box>
+			<text><![CDATA[ID]]></text>
+		</element>
+		<element kind="staticText" uuid="f3dae4b7-f89d-4d01-8db3-1afd6e4c1c07" x="40" y="0" width="175" height="20" backcolor="#EEEEEE" mode="Opaque" fontSize="10.0" bold="true" hTextAlign="Left" vTextAlign="Middle">
+			<box leftPadding="4">
+				<bottomPen lineWidth="1.0" lineColor="#2E7D32"/>
+			</box>
+			<text><![CDATA[Nome]]></text>
+		</element>
+		<element kind="staticText" uuid="013761b9-2268-4479-a2e1-f1d14826d114" x="215" y="0" width="100" height="20" backcolor="#EEEEEE" mode="Opaque" fontSize="10.0" bold="true" hTextAlign="Left" vTextAlign="Middle">
+			<box leftPadding="4">
+				<bottomPen lineWidth="1.0" lineColor="#2E7D32"/>
+			</box>
+			<text><![CDATA[CPF]]></text>
+		</element>
+		<element kind="staticText" uuid="742d0619-b690-42ed-99c8-08b77efdf4e1" x="315" y="0" width="150" height="20" backcolor="#EEEEEE" mode="Opaque" fontSize="10.0" bold="true" hTextAlign="Left" vTextAlign="Middle">
+			<box leftPadding="4">
+				<bottomPen lineWidth="1.0" lineColor="#2E7D32"/>
+			</box>
+			<text><![CDATA[E-mail]]></text>
+		</element>
+		<element kind="staticText" uuid="88030eb3-259c-43d1-9048-488d8f4e4a9d" x="465" y="0" width="90" height="20" backcolor="#EEEEEE" mode="Opaque" fontSize="10.0" bold="true" hTextAlign="Left" vTextAlign="Middle">
+			<box leftPadding="4">
+				<bottomPen lineWidth="1.0" lineColor="#2E7D32"/>
+			</box>
+			<text><![CDATA[Cadastrado em]]></text>
+		</element>
+	</columnHeader>
+	<detail>
+		<band height="18">
+			<element kind="textField" uuid="56f46364-3aba-4f9c-996d-30b497bcee27" x="0" y="0" width="40" height="18" fontSize="9.0" blankWhenNull="true" hTextAlign="Left" vTextAlign="Middle">
+				<box leftPadding="4">
+					<bottomPen lineWidth="0.5" lineColor="#EEEEEE"/>
+				</box>
+				<expression><![CDATA[$F{id}]]></expression>
+			</element>
+			<element kind="textField" uuid="9059dc9f-cab0-4139-8d23-4eda9e3a92b6" x="40" y="0" width="175" height="18" fontSize="9.0" blankWhenNull="true" hTextAlign="Left" vTextAlign="Middle">
+				<box leftPadding="4">
+					<bottomPen lineWidth="0.5" lineColor="#EEEEEE"/>
+				</box>
+				<expression><![CDATA[$F{nome}]]></expression>
+			</element>
+			<element kind="textField" uuid="0fd15424-5b07-470a-8b4b-bf3bb1cd7038" x="215" y="0" width="100" height="18" fontSize="9.0" blankWhenNull="true" hTextAlign="Left" vTextAlign="Middle">
+				<box leftPadding="4">
+					<bottomPen lineWidth="0.5" lineColor="#EEEEEE"/>
+				</box>
+				<expression><![CDATA[$F{cpf} != null && $F{cpf}.length() == 11 ? $F{cpf}.substring(0, 3) + "." + $F{cpf}.substring(3, 6) + "." + $F{cpf}.substring(6, 9) + "-" + $F{cpf}.substring(9) : $F{cpf}]]></expression>
+			</element>
+			<element kind="textField" uuid="0640dfb2-9e62-4c5b-aa7d-ec6e08478745" x="315" y="0" width="150" height="18" fontSize="9.0" blankWhenNull="true" hTextAlign="Left" vTextAlign="Middle">
+				<box leftPadding="4">
+					<bottomPen lineWidth="0.5" lineColor="#EEEEEE"/>
+				</box>
+				<expression><![CDATA[$F{email}]]></expression>
+			</element>
+			<element kind="textField" uuid="cef02bab-5dbc-46e8-a34d-dc0d2520cdac" x="465" y="0" width="90" height="18" fontSize="9.0" pattern="dd/MM/yyyy HH:mm" blankWhenNull="true" hTextAlign="Left" vTextAlign="Middle">
+				<box leftPadding="4">
+					<bottomPen lineWidth="0.5" lineColor="#EEEEEE"/>
+				</box>
+				<expression><![CDATA[$F{data_criacao}]]></expression>
+			</element>
+		</band>
+	</detail>
+	<pageFooter height="20">
+		<element kind="textField" uuid="0b782990-f419-4c77-a326-ac3fb12ee03b" x="0" y="4" width="555" height="14" fontSize="8.0" blankWhenNull="true" hTextAlign="Right" vTextAlign="Middle">
+			<expression><![CDATA["Página " + $V{PAGE_NUMBER}]]></expression>
+		</element>
+	</pageFooter>
+	<summary height="24">
+		<element kind="textField" uuid="dc3ecd83-1e92-4e91-a269-f204f34a4d5e" x="0" y="6" width="555" height="16" fontSize="10.0" bold="true" blankWhenNull="true" hTextAlign="Right" vTextAlign="Middle">
+			<expression><![CDATA["Total de clientes: " + $V{REPORT_COUNT}]]></expression>
+		</element>
+	</summary>
+</jasperReport>

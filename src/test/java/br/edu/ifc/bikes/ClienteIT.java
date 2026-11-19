@@ -3,6 +3,8 @@ package br.edu.ifc.bikes;
 import br.edu.ifc.bikes.dto.ClienteCreateDto;
 import br.edu.ifc.bikes.dto.ClienteResponseDto;
 import br.edu.ifc.bikes.web.exception.ErrorMessage;
+import com.lowagie.text.pdf.PdfReader;
+import com.lowagie.text.pdf.parser.PdfTextExtractor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -231,5 +233,49 @@ public class ClienteIT {
 
         assertThat(responseBody).isNotNull();
         assertThat(responseBody.getStatus()).isEqualTo(404);
+    }
+
+    @Test //O PDF É LIDO DE VOLTA PARA CONFERIR O CONTEÚDO (NOME E CPF FORMATADO DA MARIA)
+    public void gerarRelatorio_PeloAdmin_RetornaPdfComClientesStatus200() throws Exception {
+        byte[] pdf = testClient
+                .get()
+                .uri("/api/v1/clientes/relatorio")
+                .headers(JwtAuthentication.oAuth(testClient, "jose@gmail.com", "123456"))
+                .exchange()
+                .expectStatus().isOk()
+                .expectHeader().contentType(MediaType.APPLICATION_PDF)
+                .expectBody(byte[].class)
+                .returnResult().getResponseBody();
+
+        assertThat(pdf).isNotNull();
+        assertThat(new String(pdf, 0, 5)).isEqualTo("%PDF-");
+
+        PdfReader reader = new PdfReader(pdf);
+        String texto = new PdfTextExtractor(reader).getTextFromPage(1);
+        reader.close();
+        assertThat(texto).contains("Relatório de Clientes");
+        assertThat(texto).contains("Maria da Silva");
+        assertThat(texto).contains("529.982.247-25");
+        assertThat(texto).contains("maria@gmail.com");
+        assertThat(texto).contains("Total de clientes: 1");
+    }
+
+    @Test
+    public void gerarRelatorio_UsuarioCliente_RetornaStatus403(){
+        testClient
+                .get()
+                .uri("/api/v1/clientes/relatorio")
+                .headers(JwtAuthentication.oAuth(testClient, "maria@gmail.com", "123456"))
+                .exchange()
+                .expectStatus().isForbidden();
+    }
+
+    @Test
+    public void gerarRelatorio_SemAutenticacao_RetornaStatus403(){
+        testClient
+                .get()
+                .uri("/api/v1/clientes/relatorio")
+                .exchange()
+                .expectStatus().isForbidden();
     }
 }

@@ -635,13 +635,30 @@ o cliente deve ter um `usuário` cadastrado e autenticado.
 - id (Long)
 - codigo (String) - deve ser único, de 4 a 10 caracteres
 - modelo (String)
-- status (`LIVRE` ou `ALUGADA`)
+- status (`LIVRE`, `ALUGADA` ou `MANUTENCAO`)
 - métodos `equals` e `hashCode`
 - Campos de auditoria (os mesmos de `Usuário`)
 
-**Funcionalidades** (todas exigem autenticação):
-- `POST /api/v1/bicicletas`: cadastro, apenas para o Admin. Código repetido retorna `409`.
-- `GET /api/v1/bicicletas`: lista todas as bicicletas, para Admin e Cliente.
-- `GET /api/v1/bicicletas/{codigo}`: consulta pelo código, para Admin e Cliente.
+**Funcionalidades** (todas exigem autenticação e são restritas ao Admin, conforme a descrição do projeto):
+- `POST /api/v1/bicicletas`: cadastro (`LIVRE` ou `MANUTENCAO`). Código repetido retorna `409`.
+- `GET /api/v1/bicicletas`: lista todas as bicicletas.
+- `GET /api/v1/bicicletas/{codigo}`: consulta pelo código.
+- `PATCH /api/v1/bicicletas/{codigo}/status`: alterna entre `LIVRE` e `MANUTENCAO`. Bicicleta alugada retorna `409` (ela só muda de status pela devolução).
 
-**Classes criadas:** `Bicicleta`, `BicicletaCreateDto`, `BicicletaResponseDto`, `BicicletaMapper`, `BicicletaRepository`, `BicicletaService`, `BicicletaController`, `CodigoUniqueViolationException` e os testes em `BicicletaIT`.
+**Classes criadas:** `Bicicleta`, `BicicletaCreateDto`, `BicicletaStatusDto`, `BicicletaResponseDto`, `BicicletaMapper`, `BicicletaRepository`, `BicicletaService`, `BicicletaController`, `CodigoUniqueViolationException`, `BicicletaIndisponivelException` e os testes em `BicicletaIT`.
+
+## Projeto final - Locações, devoluções e relatórios
+Requisitos 6, 7 e 8 da descrição do projeto (`descricao-projeto-bikes.pdf`).
+
+- `POST /api/v1/locacoes` (Cliente): o sistema escolhe uma bicicleta livre e registra a retirada. O cliente informa a data/hora prevista para devolução e os dados do cartão de crédito; só os 4 últimos dígitos são gravados. Sem bicicleta livre, retorna `409`.
+- `PATCH /api/v1/locacoes/{id}/devolucao` (Admin ou o cliente dono): registra a devolução, calcula o tempo de uso e o valor (por hora iniciada, `bikes.locacao.valor-hora` no `application.properties`). A bicicleta volta a `LIVRE`, ou vai para `MANUTENCAO` com o corpo `{"manutencao": true}`.
+- `GET /api/v1/locacoes/relatorio` (Admin): todas as locações com nome do cliente, código da bicicleta, datas, duração e status.
+- `GET /api/v1/locacoes/minhas` (Cliente) e `GET /api/v1/locacoes/{id}` (Admin ou o cliente dono).
+
+Testes em `LocacaoIT`.
+
+## Relatório de clientes em PDF (JasperReports)
+- `GET /api/v1/clientes/relatorio` (Admin): PDF com id, nome, CPF, e-mail e data de cadastro dos clientes.
+- Arquivos em `src/main/resources/reports`: `clientes-bikes.jrxml` (fonte, abre no Jaspersoft Studio 7), `clientes-bikes.jasper` (compilado, usado pela aplicação) e `images/bikes2.png` (cabeçalho).
+- Ajustes no `JasperService`: a conexão com o banco é fechada ao final, os parâmetros são criados a cada chamada, erros viram `RelatorioException` (`500` com mensagem) e `IMG_DIR` recebe a URL real da pasta `reports/`.
+- Testes em `ClienteIT`: o PDF é lido de volta para conferir o conteúdo.
