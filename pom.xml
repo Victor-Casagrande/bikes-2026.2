@@ -136,6 +136,12 @@
 			<artifactId>jasperreports-pdf</artifactId>
 			<version>7.0.8</version>
 		</dependency>
+		<!-- Fonte DejaVu Sans embutida no PDF (com negrito e acentos) -->
+		<dependency>
+			<groupId>net.sf.jasperreports</groupId>
+			<artifactId>jasperreports-fonts</artifactId>
+			<version>7.0.8</version>
+		</dependency>
 	</dependencies>
 
 	<build>
