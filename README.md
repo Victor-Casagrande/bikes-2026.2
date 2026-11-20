@@ -662,3 +662,11 @@ Testes em `LocacaoIT`.
 - Arquivos em `src/main/resources/reports`: `clientes-bikes.jrxml` (fonte, abre no Jaspersoft Studio 7), `clientes-bikes.jasper` (compilado, usado pela aplicação) e `images/bikes2.png` (cabeçalho).
 - Ajustes no `JasperService`: a conexão com o banco é fechada ao final, os parâmetros são criados a cada chamada, erros viram `RelatorioException` (`500` com mensagem) e `IMG_DIR` recebe a URL real da pasta `reports/`.
 - Testes em `ClienteIT`: o PDF é lido de volta para conferir o conteúdo.
+
+## Ajustes finais
+- **Criar ADMIN pela API:** `POST /api/v1/usuarios` aceita o campo opcional `"role": "ADMIN"` ou `"CLIENTE"`; sem ele, o usuário é CLIENTE. Um ADMIN só pode ser criado com o token de outro admin; a exceção é o primeiro admin do sistema, que pode ser criado sem token. Fora isso, a resposta é `403`.
+- **Datas no formato brasileiro:** as respostas de locação e o relatório de locações mostram as datas como `dd/MM/yyyy HH:mm`. Na solicitação, `dataPrevistaDevolucao` continua no formato ISO (`2026-11-21T18:00:00`).
+- **Fonte do relatório PDF:** DejaVu Sans Condensed, da dependência `jasperreports-fonts`, embutida no PDF, com negrito e acentos.
+- **JWT:** o cabeçalho `Authorization: Bearer ` sem token passa a ser tratado como requisição sem autenticação; antes, gerava erro `500`.
+- **Coleção do Postman:** o arquivo [postman/Bikes.postman_collection.json](postman/Bikes.postman_collection.json) traz o fluxo completo, com usuários, bicicletas, clientes, locações, devoluções, relatórios e erros esperados. O login guarda os tokens e a solicitação de locação guarda o id usado na devolução. Para usar: Postman → *Import* → selecione o arquivo → *Run collection*, ou execute as pastas na ordem.
+- O token JWT expira em 20 minutos; depois disso, faça o login de novo.
