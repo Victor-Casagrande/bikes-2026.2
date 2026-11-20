@@ -266,4 +266,101 @@ public class UsuarioIT extends RuntimeException {
                 .exchange()
                 .expectStatus().isForbidden();
     }
+
+    // ===== Perfil (role) na criação de usuário
+
+    @Test //UM ADMIN AUTENTICADO PODE CADASTRAR OUTRO ADMIN
+    public void criarUsuario_AdminPeloAdmin_RetornaUsuarioAdminStatus201(){
+        UsuarioResponseDTO responseBody = testClient
+                .post()
+                .uri("/api/v1/usuarios")
+                .contentType(MediaType.APPLICATION_JSON)
+                .headers(JwtAuthentication.oAuth(testClient, "jose@gmail.com", "123456"))
+                .bodyValue(new UsuarioRequestDTO("ana.admin@gmail.com", "123456", "ADMIN"))
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(UsuarioResponseDTO.class)
+                .returnResult().getResponseBody();
+
+        org.assertj.core.api.Assertions.assertThat(responseBody).isNotNull();
+        org.assertj.core.api.Assertions.assertThat(responseBody.role()).isEqualTo("ADMIN");
+    }
+
+    @Test //JÁ EXISTE ADMIN: SEM TOKEN OU COM TOKEN DE CLIENTE NÃO É POSSÍVEL CRIAR OUTRO
+    public void criarUsuario_AdminSemSerAdmin_RetornaErrorMessageStatus403(){
+        ErrorMessage responseBody = testClient
+                .post()
+                .uri("/api/v1/usuarios")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(new UsuarioRequestDTO("intruso@gmail.com", "123456", "ADMIN"))
+                .exchange()
+                .expectStatus().isForbidden()
+                .expectBody(ErrorMessage.class)
+                .returnResult().getResponseBody();
+
+        org.assertj.core.api.Assertions.assertThat(responseBody).isNotNull();
+        org.assertj.core.api.Assertions.assertThat(responseBody.getStatus()).isEqualTo(403);
+
+        testClient
+                .post()
+                .uri("/api/v1/usuarios")
+                .contentType(MediaType.APPLICATION_JSON)
+                .headers(JwtAuthentication.oAuth(testClient, "maria@gmail.com", "123456"))
+                .bodyValue(new UsuarioRequestDTO("intruso@gmail.com", "123456", "ROLE_ADMIN"))
+                .exchange()
+                .expectStatus().isForbidden();
+    }
+
+    @Test //SEM NENHUM ADMIN NO BANCO, O PRIMEIRO PODE SER CRIADO SEM TOKEN
+    @Sql(scripts = "/sql/usuarios/usuarios-delete.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(scripts = "/sql/usuarios/usuarios-delete.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+    public void criarUsuario_PrimeiroAdminSemToken_RetornaUsuarioAdminStatus201(){
+        UsuarioResponseDTO responseBody = testClient
+                .post()
+                .uri("/api/v1/usuarios")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(new UsuarioRequestDTO("primeiro.admin@gmail.com", "123456", "ADMIN"))
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(UsuarioResponseDTO.class)
+                .returnResult().getResponseBody();
+
+        org.assertj.core.api.Assertions.assertThat(responseBody).isNotNull();
+        org.assertj.core.api.Assertions.assertThat(responseBody.role()).isEqualTo("ADMIN");
+    }
+
+    @Test //CABEÇALHO "Bearer " SEM TOKEN É TRATADO COMO REQUISIÇÃO SEM AUTENTICAÇÃO (E NÃO ERRO 500)
+    public void requisicao_BearerVazio_TratadaComoSemToken(){
+        testClient
+                .post()
+                .uri("/api/v1/usuarios")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", "Bearer ")
+                .bodyValue(new UsuarioRequestDTO("novo@gmail.com", "123456"))
+                .exchange()
+                .expectStatus().isCreated();
+
+        testClient
+                .get()
+                .uri("/api/v1/usuarios")
+                .header("Authorization", "Bearer ")
+                .exchange()
+                .expectStatus().isForbidden();
+    }
+
+    @Test
+    public void criarUsuario_RoleInvalida_RetornaErrorMessageStatus422(){
+        ErrorMessage responseBody = testClient
+                .post()
+                .uri("/api/v1/usuarios")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(new UsuarioRequestDTO("novo@gmail.com", "123456", "GERENTE"))
+                .exchange()
+                .expectStatus().isEqualTo(422)
+                .expectBody(ErrorMessage.class)
+                .returnResult().getResponseBody();
+
+        org.assertj.core.api.Assertions.assertThat(responseBody).isNotNull();
+        org.assertj.core.api.Assertions.assertThat(responseBody.getStatus()).isEqualTo(422);
+    }
 }

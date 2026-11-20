@@ -64,7 +64,8 @@ public class JwtUtils {
                     .verifyWith(generateKey())
                     .build()
                     .parseSignedClaims(refactorToken(token)).getPayload();
-        } catch (JwtException e) {
+        } catch (JwtException | IllegalArgumentException e) {
+            //IllegalArgumentException: cabeçalho "Bearer " sem token (antes virava erro 500)
             System.err.println("Token inválido!");
         }
         return null;

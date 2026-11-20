@@ -3,9 +3,11 @@ package br.edu.ifc.bikes.web.controller;
 import br.edu.ifc.bikes.dto.UsuarioRequestDTO;
 import br.edu.ifc.bikes.dto.UsuarioResponseDTO;
 import br.edu.ifc.bikes.dto.UsuarioSenhaDto;
+import br.edu.ifc.bikes.jwt.JwtUserDetails;
 import br.edu.ifc.bikes.service.UsuarioService;
 import br.edu.ifc.bikes.web.exception.ErrorMessage;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -16,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,18 +32,26 @@ public class UsuarioController {
 
     private final UsuarioService usuarioService;
 
-    @Operation(summary = "Criar um novo usuário", description = "Recurso para criar um novo usuário",
+    @Operation(summary = "Criar um novo usuário",
+        description = "Recurso para criar um novo usuário, sem necessidade de autenticação. O campo 'role' é opcional: " +
+                "sem ele o usuário é CLIENTE. Para criar um ADMIN é preciso enviar o Bearer Token de um administrador; " +
+                "a única exceção é o primeiro administrador do sistema, que pode ser criado sem token.",
         responses = {
                 @ApiResponse(responseCode = "201", description = "Recurso criado com sucesso",
                         content = @Content(mediaType = "application/json", schema = @Schema(implementation = UsuarioResponseDTO.class))),
+                @ApiResponse(responseCode = "403", description = "Tentativa de criar um ADMIN sem ser administrador",
+                        content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class))),
                 @ApiResponse(responseCode = "409", description = "Usuário e-mail já cadastrado no sistema",
                         content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class))),
                 @ApiResponse(responseCode = "422", description = "Recurso não processado por dados de entrada inválidos",
                         content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class)))
         })
     @PostMapping
-    public ResponseEntity<UsuarioResponseDTO> create(@Valid @RequestBody UsuarioRequestDTO usuario) {
-        UsuarioResponseDTO usuarioCriado  = usuarioService.create(usuario);
+    public ResponseEntity<UsuarioResponseDTO> create(@Valid @RequestBody UsuarioRequestDTO usuario,
+                                                     @Parameter(hidden = true) @AuthenticationPrincipal JwtUserDetails solicitante) {
+        //solicitante é null quando a requisição não traz token (o cadastro é público)
+        boolean solicitanteAdmin = solicitante != null && "ADMIN".equals(solicitante.getRole());
+        UsuarioResponseDTO usuarioCriado  = usuarioService.create(usuario, solicitanteAdmin);
         return ResponseEntity.status(HttpStatus.CREATED).body(usuarioCriado);
     }
 

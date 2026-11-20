@@ -6,6 +6,7 @@ import br.edu.ifc.bikes.dto.mapper.UsuarioMapper;
 import br.edu.ifc.bikes.entity.Usuario;
 import br.edu.ifc.bikes.exception.EntityNotFoundException;
 import br.edu.ifc.bikes.exception.PasswordInvalidException;
+import br.edu.ifc.bikes.exception.PerfilNaoAutorizadoException;
 import br.edu.ifc.bikes.exception.UsernameUniqueViolationException;
 import br.edu.ifc.bikes.jwt.JwtAuthorizationFilter;
 import br.edu.ifc.bikes.jwt.JwtUserDetailsService;
@@ -26,14 +27,30 @@ public class UsuarioService {
     private final UsuarioMapper usuarioMapper;
     private final PasswordEncoder passwordEncoder;
 
-    public UsuarioResponseDTO create(UsuarioRequestDTO usuarioRequestDTO) {
+    //solicitanteAdmin: a requisição veio com o token de um ADMIN
+    public UsuarioResponseDTO create(UsuarioRequestDTO usuarioRequestDTO, boolean solicitanteAdmin) {
+        Usuario.Role role = definirRole(usuarioRequestDTO.role(), solicitanteAdmin);
         try {
             Usuario usuario = usuarioMapper.toUsuario(usuarioRequestDTO);
+            usuario.setRole(role);
             usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
             return usuarioMapper.toResponse(usuarioRepository.save(usuario));
         }catch (RuntimeException ex){
             throw new UsernameUniqueViolationException(String.format("O nome do usuário '%s' já existe", usuarioRequestDTO.username()));
         }
+    }
+
+    //sem perfil informado: CLIENTE. ADMIN: só por outro admin, ou o primeiro admin do sistema
+    private Usuario.Role definirRole(String roleInformada, boolean solicitanteAdmin) {
+        if (roleInformada == null || roleInformada.isBlank()) {
+            return Usuario.Role.ROLE_CLIENTE;
+        }
+        Usuario.Role role = Usuario.Role.valueOf(roleInformada.startsWith("ROLE_") ? roleInformada : "ROLE_" + roleInformada);
+        if (role == Usuario.Role.ROLE_ADMIN && !solicitanteAdmin && usuarioRepository.existsByRole(Usuario.Role.ROLE_ADMIN)) {
+            throw new PerfilNaoAutorizadoException(
+                    "Apenas um administrador autenticado pode cadastrar outro administrador");
+        }
+        return role;
     }
 
     @Transactional()

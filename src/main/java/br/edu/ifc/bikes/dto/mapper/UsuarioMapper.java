@@ -9,6 +9,8 @@ import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface UsuarioMapper {
+    //o perfil é definido pelo UsuarioService, que verifica quem pode criar um ADMIN
+    @Mapping(target = "role", ignore = true)
     Usuario toUsuario(UsuarioRequestDTO usuarioRequestDTO);
 
     //o enum é ROLE_ADMIN/ROLE_CLIENTE (exigência do Spring Security); a resposta expõe só ADMIN/CLIENTE
