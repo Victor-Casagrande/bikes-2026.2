@@ -9,6 +9,6 @@ public record UsuarioLoginDto(
         @Email(message = "Deve ser um email válido")
         String username,
         @NotBlank
-        @Size(min = 6, max = 6)
+        @Size(min = 6, max = 6, message = "A senha deve ter 6 caracteres")
         String password
 ){}

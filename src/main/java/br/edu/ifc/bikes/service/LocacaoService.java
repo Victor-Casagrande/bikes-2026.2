@@ -19,6 +19,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -81,7 +82,8 @@ public class LocacaoService {
         Locacao locacao = buscarPorId(id, usuario);
         if (locacao.getStatus() == Locacao.StatusLocacao.FINALIZADA) {
             throw new LocacaoFinalizadaException(
-                    String.format("A locação com id=%d já foi finalizada em %s", id, locacao.getDataDevolucao()));
+                    String.format("A locação com id=%d já foi finalizada em %s", id,
+                            locacao.getDataDevolucao().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))));
         }
 
         LocalDateTime agora = LocalDateTime.now();

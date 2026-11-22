@@ -5,13 +5,13 @@ import jakarta.validation.constraints.Size;
 
 public record UsuarioSenhaDto(
         @NotBlank(message = "A nova senha é obrigatória")
-        @Size(min=6, max=6)
+        @Size(min = 6, max = 6, message = "A senha deve ter 6 caracteres")
         String novaSenha,
         @NotBlank(message = "A confirmação senha é obrigatória")
-        @Size(min=6, max=6)
+        @Size(min = 6, max = 6, message = "A senha deve ter 6 caracteres")
         String confirmaSenha,
         @NotBlank(message = "A senha atual é obrigatória")
-        @Size(min=6, max=6)
+        @Size(min = 6, max = 6, message = "A senha deve ter 6 caracteres")
         String senhaAtual
 ) {
 }
