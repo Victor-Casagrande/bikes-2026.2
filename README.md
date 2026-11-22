@@ -670,3 +670,4 @@ Testes em `LocacaoIT`.
 - **JWT:** o cabeçalho `Authorization: Bearer ` sem token passa a ser tratado como requisição sem autenticação; antes, gerava erro `500`.
 - **Coleção do Postman:** o arquivo [postman/Bikes.postman_collection.json](postman/Bikes.postman_collection.json) traz o fluxo completo, com usuários, bicicletas, clientes, locações, devoluções, relatórios e erros esperados. O login guarda os tokens e a solicitação de locação guarda o id usado na devolução. Para usar: Postman → *Import* → selecione o arquivo → *Run collection*, ou execute as pastas na ordem.
 - O token JWT expira em 20 minutos; depois disso, faça o login de novo.
+- **Roteiro de apresentação:** [docs/ROTEIRO-APRESENTACAO.md](docs/ROTEIRO-APRESENTACAO.md) traz, requisito por requisito do PDF, cada teste com a requisição e a resposta esperada (respostas reais capturadas com o banco vazio).
