@@ -58,7 +58,7 @@ public class ClienteController {
         byte[] relatorio = jasperService.generatePdf();
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_PDF)
-                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=" + System.currentTimeMillis() + ".pdf")
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=relatorio-clientes-" + System.currentTimeMillis() + ".pdf")
                 .body(relatorio);
     }
 
