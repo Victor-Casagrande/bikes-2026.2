@@ -669,4 +669,4 @@ Testes em `LocacaoIT`.
 - **Fonte do relatório PDF:** DejaVu Sans Condensed, da dependência `jasperreports-fonts`, embutida no PDF, com negrito e acentos.
 - **JWT:** o cabeçalho `Authorization: Bearer ` sem token passa a ser tratado como requisição sem autenticação; antes, gerava erro `500`.
 - **Coleção do Postman:** o arquivo [postman/Bikes.postman_collection.json](postman/Bikes.postman_collection.json) traz o fluxo completo, com usuários, bicicletas, clientes, locações, devoluções, relatórios e erros esperados. O login guarda os tokens e a solicitação de locação guarda o id usado na devolução. Para usar: Postman → *Import* → selecione o arquivo → *Run collection*, ou execute as pastas na ordem.
-- O token JWT expira em 20 minutos; depois disso, faça o login de novo.
+- O token JWT expira em 120 minutos (2 horas; era 20 minutos); depois disso, faça o login de novo.
